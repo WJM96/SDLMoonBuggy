@@ -19,13 +19,14 @@ void Context::init(std::string title, int w, int h){
 		Log::warn("Couldn't initialize Window!");
 		Log::warn(SDL_GetError());
 	}
-	
+
 	//and the renderer
 	ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if(ren == NULL){
 		Log::warn("Couldn't initialize Renderer!");
 		Log::warn(SDL_GetError());
 	}
+	
 	
 	//SDL_img
 	if(!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)){

@@ -3,9 +3,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 #include "log.hpp"
-#include "audio.hpp"
-#include "context.hpp"
-#include "animation.hpp"
+#include "player.hpp"
+#include "score.hpp"
 
 const std::string VERSION = "v0.0.1";
 const std::string TITLE = "Moon Buggy";
@@ -14,12 +13,15 @@ const std::string AUTHOR = "Wesley McClintock";
 int main(int argc, char* argv[]){
 	Audio::init();
 	Context::init(TITLE + " " + VERSION + "--" + AUTHOR, 640, 480);
+	Scoreboard::init();
 	
-	Animation testAnim;
-	testAnim.set({0, 0, 36, 20}, 4, 100);
-	SDL_Texture* texture = Context::loadTexture("./res/sprites.png");
+	
+	SDL_Texture* sprites = Context::loadTexture("./res/sprites.png");
+	
+	Player player;
 	
 	SDL_Event event;
+	const unsigned char* keys = SDL_GetKeyboardState(NULL);
 	bool playing = true;
 	
 	int now = SDL_GetTicks();
@@ -31,14 +33,29 @@ int main(int argc, char* argv[]){
 				playing = false;
 			}
 		}
+		//check input
+		if(keys[SDL_SCANCODE_SPACE]){
+			player.jump();
+		}
+		if(keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT]){
+			player.moveLeft(dt);
+		}
+		if(keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT]){
+			player.moveRight(dt);
+		}
+		
 		
 		//update and draw
-		testAnim.update(dt);
-		testAnim.draw(30, 30, texture);
+		player.update(dt);
+		player.draw(sprites);
+		Scoreboard::drawScore();
 		
 		//show 
 		SDL_RenderPresent(Context::ren);
 		SDL_RenderClear(Context::ren);
+		
+		//wait
+		SDL_Delay(32);
 		
 		now = SDL_GetTicks();
 		dt = now - last;
@@ -48,9 +65,10 @@ int main(int argc, char* argv[]){
 	
 	
 	
-	SDL_DestroyTexture(texture);
+	SDL_DestroyTexture(sprites);
 	Audio::quit();
 	Context::quit();
+	Scoreboard::quit();
 	SDL_Quit();
 	return 0;
 }
